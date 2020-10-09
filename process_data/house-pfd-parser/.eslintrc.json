@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module",
+    "project": "house-pfd-parser/tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "curly": ["error", "all"],
+    "eqeqeq": ["error", "always"],
+    "require-await": ["error"],
+    "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/no-floating-promises": ["error"],
+    "@typescript-eslint/no-unused-expressions": ["error"],
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      {
+        "functions": false
+      }
+    ],
+    "@typescript-eslint/restrict-plus-operands": ["error"],
+    "@typescript-eslint/strict-boolean-expressions": ["error"]
+  }
+}
