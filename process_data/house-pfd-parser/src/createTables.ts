@@ -27,7 +27,9 @@ export const createTables = (
       table = fixRowsThatCrossPages(table, fileName);
 
       if (table.cols.length > 1) {
-        const columns = ['file'].concat(table.cols.map((col) => col.slug));
+        const columns = ['file']
+          .concat(table.cols.map((col) => col.slug))
+          .filter((x) => x !== 'tx.->-$1-000?');
         let csvString = csvFormat(table.rows, columns);
         csvString = reformatHeaders(csvString);
         if (skipHeaders[table.name]) {

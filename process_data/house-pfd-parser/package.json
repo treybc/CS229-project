@@ -7,7 +7,7 @@
     "build": "rm -rf ./build/ && tsc",
     "format": "prettier --ignore-path .gitignore --write .",
     "lint": "eslint --max-warnings 0 src/*.ts",
-    "start": "npm run build && rm -rf ../data/parsed_disclosures/ && node ./build/index.js"
+    "start": "npm run build && rm -rf ../../data/pfd/parsed_disclosures/ && node ./build/index.js"
   },
   "author": "",
   "license": "MIT",

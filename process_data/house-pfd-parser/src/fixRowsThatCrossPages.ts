@@ -13,7 +13,11 @@ export const fixRowsThatCrossPages = (
         const valueLength = row[key].length;
         const lastCharacter = row[key][valueLength - 1];
         // Find values that end in "-", which means they got cut off
-        if (lastCharacter !== undefined && lastCharacter === '-') {
+        if (
+          !['type', 'asset', 'date-incurred', 'source'].includes(key) &&
+          lastCharacter !== undefined &&
+          lastCharacter === '-'
+        ) {
           // Append all values of next row
           if (row['page'] !== table.rows[index + 1]['page']) {
             keys.forEach((k) => {
