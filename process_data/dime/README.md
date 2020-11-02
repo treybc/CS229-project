@@ -11,3 +11,6 @@ Note that two contain all recipients/donors from 1979, and so need to be filtere
 These are large files, especially the ~27GB contributions file, so we want to
 get it all into sqlite so that we can handle the data while it's on disk instead
 of having to load it all into memory.
+
+The `merge_primary_data.py` file will merge DIME with the FEC primary elections data.
+This is also a little messy; there are <100 not-perfectly-matched things I just threw away.

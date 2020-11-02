@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import pandas as pd
+from merge_primary_data import merge_primary_data
 
 # NB: this is just me putting the code I ran just in the terminal into these functions
 
@@ -116,3 +117,4 @@ if __name__ == "__main__":
     csv_to_sqlite()
     merge_and_subset()
     get_first_ninety_days_fundraising()
+    merge_primary_data()
