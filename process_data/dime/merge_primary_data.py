@@ -90,12 +90,11 @@ def download_primary_data():
 
 def merge_primary_data():
     df_dime = pd.read_csv("../../data/dime_final.csv")
-    df_dime.drop_duplicates(subset=["cycle", "rid", "district"], inplace=True)
-    df_dime.drop_duplicates(subset=["cycle", "Cand.ID"], inplace=True)
     df_primary = download_primary_data()
     df_merged = pd.merge(df_dime, df_primary, how="left", on=["Cand.ID", "cycle"])
-    df_merged.drop(columns=["Unnamed: 0", "index"])
-    df_merged.to_csv("../../data/dime_with_primaries.csv")
+    # 11/6/2020: 10510 pre-2020 DIME candidates, 4826 primary results of which 51 unmatched
+    df_merged.drop(columns=["Unnamed: 0", "Unnamed: 0.1"], inplace=True)
+    df_merged.to_csv("../../data/dime_with_primaries.csv", index=False)
 
 
 if __name__ == "__main__":

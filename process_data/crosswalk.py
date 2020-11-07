@@ -66,7 +66,6 @@ def get_pfd_manifest() -> pd.DataFrame:
 
 def get_dime_manifest():
     df_dime = pd.read_csv("../data/dime_with_primaries.csv")
-    df_dime.drop_duplicates(subset=["cycle", "rid", "district"], inplace=True)
 
     name_fields = [
         "name",
@@ -91,11 +90,9 @@ too_many_match = 0
 missing_districts = set()
 
 
-def main():
-    df_manifest = get_pfd_manifest()
-    df_dime = get_dime_manifest()
-
+def create_crosswalk(df_manifest, df_dime):
     def find_matching_rid(row):
+        global too_many_match
         result = {"pfd_id": row["pfd_id"], "cycle": row["cycle"], "rid": None}
 
         df_candidate_set = df_dime[
@@ -158,14 +155,23 @@ def main():
                 & df_dime["ffname"].str.contains(row["first"], regex=False)
             ]
             if len(df_candidate_set) > 1 and row["cycle"] <= 2018:
-                global too_many_match
-                too_many_match += 1
+                if row.cucle != 2020:
+                    too_many_match += 1
                 # TODO: matching for now so we can just look at missing; disambiguate later
                 result["rid"] = "dupe"  # df_candidate_set.iloc[0]["rid"]
             elif len(df_candidate_set) == 0:
+                # This means we matched on too many by last name, but nothing by first...
                 pass
+                if row.cycle != 2020:
+                    too_many_match += 1
+                # TODO: matching for now so we can just look at missing; disambiguate later
+                result["rid"] = "dupe"  # df_candidate_set.iloc[0]["rid"]
             else:
                 result["rid"] = df_candidate_set.iloc[0]["rid"]
+        if result["rid"] is None and row.cycle != 2020:
+            print(row)
+            print(df_candidate_set)
+            raise ValueError
         return pd.Series(result)
 
     # One candidate-cycle may have multiple filings, so we should have a m:1 mapping
@@ -181,16 +187,21 @@ def main():
         "excess matches",
     )
     print(missing_districts)
-
-    apply_crosswalk(df_crosswalk)
+    return df_crosswalk
 
 
 def apply_crosswalk(df_crosswalk):
     pfd_final = pd.read_csv("../data/pfd/pfd_final.csv")
     df_dime = pd.read_csv("../data/dime_with_primaries.csv")
     df_final = pd.merge(
-        df_crosswalk, pfd_final, how="left", left_on="pfd_id", right_on="file"
+        df_crosswalk, pfd_final, how="right", left_on="pfd_id", right_on="file"
     )
+    # merge somehow the duplicate disclosures.
+    # TODO: currently keeping most recent filing; maybe do average or highest-information?
+    df_final = df_final.sort_values(["pfd_id"]).drop_duplicates(
+        subset=["rid", "cycle"], keep="last"
+    )
+
     df_final = pd.merge(
         df_final,
         df_dime,
@@ -198,7 +209,16 @@ def apply_crosswalk(df_crosswalk):
         left_on=["rid", "cycle"],
         right_on=["rid", "cycle"],
     )
+    df_final.dropna(subset=["rid"], inplace=True)
+
     df_final.to_csv("../data/merged_data.csv")
+
+
+def main():
+    df_manifest = get_pfd_manifest()
+    df_dime = get_dime_manifest()
+    df_crosswalk = create_crosswalk(df_manifest, df_dime)
+    apply_crosswalk(df_crosswalk)
 
 
 if __name__ == "__main__":
